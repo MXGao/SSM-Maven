@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mapper.ProductMapper">
+    <select id="findByCid" resultType="product" parameterType="string">
+        select * from product where cid=#{cid}
+    </select>
+
+    <!--根据cid查找总条目数-->
+    <select id="findTotalCount" parameterType="string" resultType="int">
+        select count(*) from product where cid=#{cid}
+    </select>
+
+    <!--查找一定数量的对象-->
+    <select id="findProductListByLimit" parameterType="product" resultType="product">
+        select * from product where cid=#{cid} limit #{offset},#{limit}
+    </select>
+
+    <select id="findByPid" resultType="product" parameterType="string">
+        select * from product where pid=#{pid}
+    </select>
+
+    <!--<insert id="addToOrderItem" parameterType="orderItem">
+        insert into orderitem values(#{itemid},#{count},#{subtotal},#{product.pid},#{order.oid})
+    </insert>-->
+    <insert id="addOrder" parameterType="order">
+        insert into orders values(#{oid},#{ordertime},#{total},#{state},#{address},#{name},#{telephone},#{user.uid})
+    </insert>
+    
+    <insert id="addOrderItem" parameterType="orderItem">
+        insert into orderitem values(#{itemid},#{count},#{subtotal},#{product.pid},#{order.oid})
+    </insert>
+
+    <select id="findOrderByUid" parameterType="string" resultType="order">
+        select * from orders where uid=#{uid}
+    </select>
+
+
+    <resultMap id="orderItemMap" type="orderItem">
+        <id column="itemid" property="itemid"></id>
+        <result column="count" property="count"></result>
+        <result column="subtotal" property="subtotal"></result>
+        <association property="product" javaType="product">
+            <id column="pid" property="pid"></id>
+            <result column="pname" property="pname"></result>
+            <result column="shop_price" property="shop_price"></result>
+            <result column="pimage" property="pimage"></result>
+        </association>
+    </resultMap>
+    <!--resulyMap需要封装什么属性，下面就查出什么属性，要是全查出来，就需要全部封装，我们只需要查出我们需要的-->
+    <select id="findOrderItemByOid" parameterType="string" resultMap="orderItemMap">
+        select oi.itemid,oi.count,oi.subtotal,p.pid,p.pname,p.pimage,p.shop_price from orderitem oi,product p where oid=#{oid} and oi.pid=p.pid
+    </select>
+
+
+</mapper>
